@@ -1,0 +1,72 @@
+sudo rm $(which k3d)
+
+kluster wird mit k3d erstellt (wurde sonst evtl woanders schon da sein), nutzt man auch eher zum ausprobieren das k3d, sonst wuerde man das cluster anders bauen
+kubectl wird genutzt um dann kybernets dann zu nutzen
+
+helm wird genutzt als package manager
+
+commands terminals 
+kubectl get pods --all-namespaces 
+
+eatch davor macht das alles 2 sec
+
+
+die vielen installationen mit dem helm ist fuer das backend von flyte, beispielsweise wollen wir ein reverser proxy um die verschiendenen microservcies über einen punkt anstrepchen kann
+
+wenn flyte console in browser zu sehen ist, hat es erst mal geklappt mir der aktivierung von flyte etc. 
+
+das image im workflow steht in dem dockerfiles des workdir
+
+workflow ist im py file von folder flytesnacks/worksflow
+
+im docker ist erst mal nichts drin, und um dann den workflwo auch indie cloud bringen zu koenenn (bei uns k3d)  mussen wir den dann den workflow packagen  (man koennte auch den completten python code in den container packen), 
+schneller ist es das man nicht alles in den image packt, sondrn der container laed beim starten eine tarbal des pythons clouads, das image wird nicht neu gebaut
+in der hier gezeigten version muss man sich wenig um das docker image kuemmern
+
+
+im flyte interface kann man dann http://127.0.0.1:30081/console/projects/flytesnacks/workflows die workflwos anschauen, 
+flyte starte jeweils eigene posd in eigenen containern, deshalb dauert es so lange (es ist nciht das python script was so lage dauert)
+jeder task decorater ist ein eigener pod der dann gebaut wird
+
+die pilepline im workflow sript sagt dann wie die tasks zusammenhaengt, man kann auch in dem Task container auch einen andeeren Docker container angeben, wenn man unabhaengig tasks hat koennten sie auch parallel laufen
+
+logs könnte man über den view anschauen, könnte man auch ueber notebook nummer 9 den pod direkt die logs geben kann 
+
+namespaces : immer name meines flyte folders - development oder -production etc, dah die entwicklungsumgebungen sind hier getrennt 
+-n flytesnacks-development 
+
+
+will man nun das orchestrierte workflow nicht manuell machen, muss man notebook ab 4 machen also ci/cd pypeline
+
+
+wir benutzen jetzt arhgo project fuer cicd pipeline (wir wuerden in der bahn des gitlab runner machen), hier jetzt mit einer lokalen version
+
+create execution in der argo_cicd configuration ist dasselbe wie in der uri von flyte auf den launch button druecken
+
+modell versionierung wäre über git hash plus eine random number
+
+
+cammand um die secrets zu sehen
+get secret -n argo
+
+
+data validation über great expectations package
+
+exceptions die bei pythn gemacht werden reicht eigentlich schon um den workflow abzubrechen, pedantic ist ein weiteres package
+
+mlflow ist gut für model_registry und tracking
+mlmetadata eher nicht nutzen (weil auf tensorflow beschränkt)
+aim ist wohl besser wenn viele datenpiunkte geloggt werden in der ui (soll das besser machen als mlflow)
+commertiell ist W&B
+
+Rat die metric nicht als mlflow track command nutzen sondern wegabstrahieren und das leicht auszutauschen
+
+
+k3d cluster stop um den clsuert zu stoppen
+
+
+fuer die sandboc erst das readme nutzen, erst danach in dem notebook arbeiten. 
+es sollte python 3.10 genutzt werden
+ausserdem gilt fuer das git repo:
+ein guthab repo nutzen, das muss unter github erstellt werden und dann kann von lokal dorthin gepusht werden nachdem man git config --local git.user <usernamevon github> und git config --local git.email eingestellt hat
+die idee ist dass dann über den acess token mit git hub geredet werden kann und der lokale inhalt in das gitrepo auf github gepusht wird
