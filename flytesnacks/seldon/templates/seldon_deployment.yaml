@@ -9,7 +9,7 @@ spec:
     - spec:
         containers:
         - name: classifier
-          image: k3d-registry.localhost:5000/classifier:d1eb231-6447
+          image: k3d-registry.localhost:5000/classifier:latest
           imagePullPolicy: Always
     graph:
       name: classifier
@@ -18,6 +18,6 @@ spec:
       parameters:
       - name: model_uri
         type: STRING
-        value: "mlflow/0/5717b0ee9fbd44df8d73ba42a75ae00a/artifacts/model/model.pkl"
+        value: "my-s3-bucket/0/f82a50532ccf499191297664e323b90f/artifacts/model/model.pkl"
     name: default
     replicas: 1

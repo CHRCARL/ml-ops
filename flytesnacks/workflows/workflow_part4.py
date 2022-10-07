@@ -29,7 +29,7 @@ SECRET_GROUP = "github-access-token"
 SECRET_KEY = "token"
 
 
-@task(cache=True, cache_version="1.2", requests=Resources(cpu="1", mem="500Mi"), limits=Resources(cpu="1", mem="500Mi"))
+@task(cache=True, cache_version="1.0", requests=Resources(cpu="1", mem="500Mi"), limits=Resources(cpu="1", mem="500Mi"))
 def prepare_data(test_size: float = 0.3) -> str:
     """Download a dataset, validate it, and return blob storage uri."""
 
@@ -58,7 +58,7 @@ def prepare_data(test_size: float = 0.3) -> str:
     return bucket
 
 
-@task(cache=True, cache_version="1.2", requests=Resources(cpu="1", mem="500Mi"), limits=Resources(cpu="1", mem="500Mi"))
+@task(cache=True, cache_version="1.0", requests=Resources(cpu="1", mem="500Mi"), limits=Resources(cpu="1", mem="500Mi"))
 def train_model(data_uri: str, n_estimators: int = 100, min_auc: float = 0.95) -> Tuple[str, str, str, str]:
     """
     Train and evaluate model on prepared data at `data_uri`.
@@ -109,7 +109,7 @@ def train_model(data_uri: str, n_estimators: int = 100, min_auc: float = 0.95) -
 
 @task(
     cache=True,
-    cache_version="1.2",
+    cache_version="1.0",
     secret_requests=[Secret(key=SECRET_KEY, group=SECRET_GROUP)],
     requests=Resources(cpu="1", mem="500Mi"),
     limits=Resources(cpu="1", mem="500Mi"),

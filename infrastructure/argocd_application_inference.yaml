@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<owner>/<repo>.git
+    repoURL: $GITHUB_REPO
     targetRevision: HEAD
     path: infrastructure/inference
     directory:

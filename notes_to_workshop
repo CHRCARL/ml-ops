@@ -70,3 +70,12 @@ es sollte python 3.10 genutzt werden
 ausserdem gilt fuer das git repo:
 ein guthab repo nutzen, das muss unter github erstellt werden und dann kann von lokal dorthin gepusht werden nachdem man git config --local git.user <usernamevon github> und git config --local git.email eingestellt hat
 die idee ist dass dann über den acess token mit git hub geredet werden kann und der lokale inhalt in das gitrepo auf github gepusht wird
+
+
+Anmerkungen zum notebook: i
+ich musste fuer das git repo noch den public key hinterlegen acess toek funtioniert erst später beim kybernetes
+
+
+
+problems 
+error: error parsing STDIN: error converting YAML to JSON: yaml: line 11: found character that cannot start any token

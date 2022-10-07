@@ -31,7 +31,7 @@ curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.4.
 k3d registry create registry.localhost --port 5000
 ```
 
-6. Erstellt einen lokalen k8s Cluster, port mapping macht das ganze auf localhost verfuegbar, das letzte (sandbox) ist der name
+6. Erstellt einen lokalen k8s Cluster
 ```bash
 mkdir -p /tmp/k3dvol
 

@@ -9,6 +9,8 @@ spec:
     steps:
     - - name: clone-repo
         template: git-clone
+    - - name: parse-github-repo
+        template: parse-github-repo
     - - name: register-and-run
         arguments:
           artifacts:
@@ -17,6 +19,8 @@ spec:
           parameters:
             - name: version
               value: "{{steps.clone-repo.outputs.result}}"
+            - name: repo-name-with-owner
+              value: "{{steps.parse-github-repo.outputs.result}}"
         template: register-and-run
   - name: git-clone
     inputs:
@@ -42,6 +46,18 @@ spec:
       artifacts:
         - name: home
           path: /src
+  - name: parse-github-repo
+    script:
+      image: bitnami/git:2.34.1
+      command: [bash]
+      source: |
+        GITHUB_REPO=$GITHUB_REPO
+        owner_url=$(dirname $${q}GITHUB_REPO)
+        OWNER_NAME=$(basename $${q}owner_url)
+        REPO_NAME_BASE=$(basename $${q}GITHUB_REPO)
+        REPO_NAME=${REPO_NAME_BASE%.*}
+        echo $${q}OWNER_NAME/$${q}REPO_NAME
+      workingDir: /tmp
   - name: register-and-run
     inputs:
       artifacts:  
@@ -49,6 +65,7 @@ spec:
         path: /src
       parameters:
       - name: version
+      - name: repo-name-with-owner
     script:
       image: k3d-registry.localhost:5000/workflow:latest
       command: [bash]
@@ -77,7 +94,40 @@ spec:
           enable-multicontainer: true
         _EOF
 
-        flytectl --config config.yaml register files --project flytesnacks --domain development --archive flyte-package.tgz --version {{inputs.parameters.version}}
-        flytectl --config config.yaml get launchplan --project flytesnacks --domain development flytesnacks.workflows.$WORKFLOW.pipeline --latest --execFile exec_spec.yaml
-        flytectl --config config.yaml create execution --project flytesnacks --domain development --execFile exec_spec.yaml
-      workingDir: /src      
+        cat > exec_spec_workflow_part1.yaml <<'_EOF'
+        iamRoleARN: ""
+        targetDomain: "development"
+        targetProject: "flytesnacks"
+        version: {{inputs.parameters.version}}
+        workflow: flytesnacks.workflows.$WORKFLOW.pipeline
+        _EOF
+
+        cat > exec_spec_workflow_part2.yaml <<'_EOF'
+        iamRoleARN: ""
+        inputs:
+            min_auc: 0.95
+            n_estimators: 100
+            test_size: 0.3
+        targetDomain: "development"
+        targetProject: "flytesnacks"
+        version: {{inputs.parameters.version}}
+        workflow: flytesnacks.workflows.$WORKFLOW.pipeline
+        _EOF
+        
+        cat > exec_spec_workflow_part3.yaml <<'_EOF'
+        iamRoleARN: ""
+        inputs:
+            min_auc: 0.95
+            n_estimators: 100
+            repository: {{inputs.parameters.repo-name-with-owner}}
+            test_size: 0.3
+        kubeServiceAcct: "model-deployer-service-account"
+        targetDomain: "development"
+        targetProject: "flytesnacks"
+        version: {{inputs.parameters.version}}
+        workflow: flytesnacks.workflows.$WORKFLOW.pipeline
+        _EOF
+
+        flytectl --config config.yaml register files --project flytesnacks --domain development --archive flyte-package.tgz --version {{inputs.parameters.version}} --k8sServiceAccount model-deployer-service-account
+        flytectl --config config.yaml create execution --project flytesnacks --domain development --execFile exec_spec_$WORKFLOW.yaml
+      workingDir: /src
